@@ -225,9 +225,12 @@ go/mod_tidy/%: go/mod_tidy_root
 	cd "$*" && GO111MODULE=on go mod tidy
 
 .PHONY: fmt
-fmt: $(BIN)/golangci-lint $(BIN)/buf $(BIN)/tk ## Automatically fix some lint errors
-	git ls-files '*.go' | grep -v 'vendor/' | grep -v 'og/' | xargs gofmt -s -w
+fmt: fmt/skip-linters $(BIN)/golangci-lint ## Automatically fix some lint errors
 	$(BIN)/golangci-lint run --fix
+
+.PHONY: fmt/skip-linters
+fmt/skip-linters: $(BIN)/buf $(BIN)/tk ## Format code without running golangci-lint fixes
+	git ls-files '*.go' | grep -v 'vendor/' | grep -v 'og/' | xargs gofmt -s -w
 	cd api/ && $(BIN)/buf format -w .
 	cd pkg && $(BIN)/buf format -w .
 	$(BIN)/tk fmt ./operations/pyroscope/jsonnet/

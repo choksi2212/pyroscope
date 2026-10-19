@@ -5,10 +5,12 @@ repos:
     hooks:
       - id: fmt
         name: Format code (Go, protobuf, jsonnet)
-        entry: make fmt
+        # Skips `golangci-lint run --fix`, which can take minutes on a cold cache.
+        # CI still runs it through `make fmt` and `make lint`.
+        entry: make fmt/skip-linters
         language: system
         pass_filenames: false
-        # Run on any file change - make fmt handles file filtering internally
+        # Run on any file change - make fmt/skip-linters handles file filtering internally
         always_run: true
 
       - id: generate
